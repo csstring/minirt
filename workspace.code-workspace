@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../data_structure_study"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"math.h": "c",
+			"vecdef.h": "c",
+			"cam_view.h": "c",
+			"mlx.h": "c",
+			"ray.h": "c",
+			"stdlib.h": "c",
+			"sc_main.h": "c",
+			"stdio.h": "c",
+			"object.h": "c"
+		}
+	}
+}
