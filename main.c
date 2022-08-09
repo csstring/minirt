@@ -6,7 +6,7 @@
 /*   By: schoe <schoe@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/19 12:51:08 by schoe             #+#    #+#             */
-/*   Updated: 2022/08/08 16:30:46 by schoe            ###   ########.fr       */
+/*   Updated: 2022/08/09 17:20:31 by schoe            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ t_color3    ray_color(double r)
     return (vplus(vmult(color3(1, 1, 1), 1.0 - t), vmult(color3(0.5, 0.7, 1.0), t)));
 }
 
-void	write_color_img(t_cam cam, t_map *map, t_sphere *sp, int i)
+void	write_color_img(t_cam cam, t_map *map, t_obj obj, int i)
 {
 	int	x;
 	int	y;
@@ -88,14 +88,14 @@ void	write_color_img(t_cam cam, t_map *map, t_sphere *sp, int i)
 		{
 			ray = get_viewport_ray(cam, x, y);
 			i = 0;
-			while (i < 3)
+			while (i != obj.sphere_max_count)
 			{
-				if (i == 0 && hit_sphere(&ray, sp[i]))
-					color = vmin(vplus((t_color3){0 , 0.4, 0}, ray.rec.fin_color), (t_color3){1,1,1});
-				else if (i == 1 && hit_sphere(&ray, sp[i]))
+				if (i == obj.sphere_max_count - 1 && hit_sphere(&ray, obj.sp[i], obj))
+					color = vmin(vplus((t_color3){0.0 ,0, 0.8}, ray.rec.fin_color), (t_color3){1,1,1});
+				else if (i % 2 == 1 && hit_sphere(&ray, obj.sp[i], obj))
+					color = vmin(vplus(ray_color(0.9) , ray.rec.fin_color), (t_color3){1,1,1});
+				else if (i % 2 == 0 && hit_sphere(&ray, obj.sp[i], obj))
 					color = vmin(vplus((t_color3){0.4 ,0, 0}, ray.rec.fin_color), (t_color3){1,1,1});
-				else if (i == 2 && hit_sphere(&ray, sp[i]))
-					color = vmin(vplus((t_color3){0.0 ,0, 0.6}, ray.rec.fin_color), (t_color3){1,1,1});
 				i++;
 			}
 			if (!ray.rec.hit_flag)
@@ -108,35 +108,43 @@ void	write_color_img(t_cam cam, t_map *map, t_sphere *sp, int i)
 	}
 }
 
-t_sphere	*make_sphere(void)
+void	make_sphere(t_obj *obj)
 {
 	t_sphere *sp;
 	int	i;
+	int	rand_per;
 
+	rand_per = 50;
 	i = 0;
-	sp = (t_sphere *)malloc(sizeof(t_sphere) * 3);
-	while (i < 2)
+	sp = (t_sphere *)malloc(sizeof(t_sphere) * rand_per);
+	while (i < rand_per)
 	{
-		sp[i] = sphere_init((t_point3){-560 + i * 1000 , -100, -1250 }, 300 + 150 *i);
+		if (rand() % 2)
+			sp[i] = sphere_init((t_point3){-3000 + rand() % rand_per * 150 , 400 - rand() % rand_per * 50, -3150 }, \
+					200 - rand() % rand_per * 2);
+		else
+			sp[i] = sphere_init((t_point3){-3000 + rand() % rand_per * 150 , -100 + rand() % rand_per * 50, -3150 }, \
+					100 + rand() % rand_per * 2);
 		i++;
 	}
-	sp[2] = sphere_init((t_point3){1 , 2200, -1150}, 1750 + 150);
-	return (sp);
+	sp[i++] = sphere_init((t_point3){1400 , 14200, -3050}, 12000);
+	obj->sp	= sp;
+	obj->sphere_max_count = i;
 }
 
 int	main(void)
 {
 	t_map	map;
 	t_cam	cam;
-	t_sphere	*sp;
+	t_obj	obj;
 	int	i;
 
 	i = 0;
 	ft_memset(&map, 0, sizeof(map));
 	ft_init_win(&map);
 	cam = cam_init((t_point3){0, 0, 0}, (t_vec3){0,0,-1});
-	sp = make_sphere();
-	write_color_img(cam, &map, sp, i);
+	make_sphere(&obj);
+	write_color_img(cam, &map, obj, i);
 	mlx_put_image_to_window(map.win.mlx, map.win.mlx_win, map.win.img, 0, 0);
 	mlx_hook(map.win.mlx_win, KEYPRESS, 0, ft_key_press, &map);
 	mlx_loop(map.win.mlx);

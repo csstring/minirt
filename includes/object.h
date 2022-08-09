@@ -9,7 +9,13 @@ typedef struct	s_sphere
 	t_point3	center;
 }	t_sphere;
 
-int	hit_sphere(t_ray *ray, t_sphere sp);
+typedef struct s_obj
+{
+	t_sphere *sp;
+	int		sphere_max_count;
+}	t_obj;
+
+int	hit_sphere(t_ray *ray, t_sphere sp, t_obj obj);
 t_sphere	sphere_init(t_point3 center, double radius);
 
 #endif

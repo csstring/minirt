@@ -3,8 +3,8 @@
 
 #include "sc_main.h"
 
-#define	WIDTH 1920
-#define HEIGT 1080
+#define	WIDTH 2560
+#define HEIGT 1440
 
 typedef struct s_camera
 {
